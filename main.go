@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/Hooneats/Syeong_server/common/app"
-	"github.com/Hooneats/Syeong_server/common/chiper"
+	"github.com/Hooneats/Syeong_server/common/ciper"
 	"github.com/Hooneats/Syeong_server/common/enum"
 	"github.com/Hooneats/Syeong_server/common/flag"
 	"github.com/Hooneats/Syeong_server/config"
@@ -35,8 +35,8 @@ func init() {
 	config.LoadConfigs(flag.Flags)
 
 	//Decrypt
-	chiper.LoadCipherKey(config.ServerConfig.Mode)
-	chiper.LoadCipherBlock()
+	ciper.LoadCipherKey(config.ServerConfig.Mode)
+	ciper.LoadCipherBlock()
 	if err := config.JWTConfig.DecryptSalt(); err != nil {
 		log.Fatal(err)
 	}
@@ -48,13 +48,12 @@ func init() {
 	logger.LoadLogger(config.LogConfig)
 
 	// model
-	err := model.LoadMongoModel(config.DBConfig.URI)
+	err := model.LoadMongoModel(config.DBConfig.URI, config.DBConfig.DBName, mongoCollectionNames)
 	if err != nil {
 		log.Fatal(err)
 	}
-	model.LoadMongoCollections(mongoCollectionNames, config.DBConfig.DBName)
 	model.CreateIndexesInModels()
-	model.InjectModelsMongoDependency(model.MongoCollection)
+	model.InjectModelsMongoDependency(model.MongoCollections)
 
 	// service
 	service.InjectServicesDependency()
@@ -63,9 +62,7 @@ func init() {
 	controller.InjectControllerDependency()
 
 	// router
-	router.SetAppRoute(
-		router.NewGinRoute(config.ServerConfig.Mode),
-	)
+	router.LoadRouter(config.ServerConfig.Mode)
 
 }
 

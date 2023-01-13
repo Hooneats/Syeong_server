@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
-	"github.com/Hooneats/Syeong_server/common/chiper"
+	"github.com/Hooneats/Syeong_server/common/ciper"
 	"os"
 	"time"
 )
@@ -18,13 +18,13 @@ type DB struct {
 }
 
 func (d *DB) DecryptURIAndDBName() error {
-	URI, err := chiper.AESDecrypt(chiper.CipherBlock, d.URI)
+	URI, err := ciper.AESDecrypt(ciper.CipherBlock, d.URI)
 	if err != nil {
 		return err
 	}
 	d.URI = URI
 
-	name, err := chiper.AESDecrypt(chiper.CipherBlock, d.DBName)
+	name, err := ciper.AESDecrypt(ciper.CipherBlock, d.DBName)
 	if err != nil {
 		return err
 	}

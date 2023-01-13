@@ -1,7 +1,5 @@
 package logger
 
-var AppLog Logger
-
 type Logger interface {
 	Debug(ctx ...interface{})
 	Info(ctx ...interface{})

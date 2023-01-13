@@ -9,30 +9,28 @@ import (
 	"time"
 )
 
-// lg 실제적인 zap 로거
+var instance *zapLog
 
 type LogConfigure interface {
 	GetSettingValues() (path, level string, size, backup, age int)
 }
+
 type zapLog struct {
 	lg *zap.Logger
 }
 
-func LoadLogger(conf LogConfigure) {
-	zap := newZap(conf)
-	AppLog = newZapLogger(zap)
+func NewZapLog() *zapLog {
+	if instance != nil {
+		return instance
+	}
+	instance = &zapLog{
+		lg: zap.L(),
+	}
+	return instance
 }
 
-func newZapLogger(z *zap.Logger) *zapLog {
-	// lg 생성
-	zapL := &zapLog{}
-	zapL.lg = z
-	zap.ReplaceGlobals(zapL.lg)
-	return zapL
-}
-
-// 로거 초기화 컨피그 파라메터
-func newZap(lcfg LogConfigure) *zap.Logger {
+// registerGlobalZapLogger global zap L 및 SugaredLogger 를 대체
+func RegisterGlobalZapLogger(lcfg LogConfigure) {
 	path, level, size, backup, age := lcfg.GetSettingValues()
 
 	now := time.Now()
@@ -45,7 +43,8 @@ func newZap(lcfg LogConfigure) *zap.Logger {
 		panic("logger load, fail")
 	}
 	core := zapcore.NewCore(encoder, writeSyncer, l)
-	return zap.New(core, zap.AddCaller())
+	z := zap.New(core, zap.AddCaller())
+	zap.ReplaceGlobals(z)
 }
 
 func (z *zapLog) Debug(ctx ...interface{}) {

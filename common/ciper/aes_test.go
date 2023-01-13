@@ -1,4 +1,4 @@
-package chiper
+package ciper
 
 import (
 	"github.com/joho/godotenv"

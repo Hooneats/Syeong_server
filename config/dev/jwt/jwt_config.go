@@ -1,6 +1,6 @@
 package jwt
 
-import "github.com/Hooneats/Syeong_server/common/chiper"
+import "github.com/Hooneats/Syeong_server/common/ciper"
 
 type JWT struct {
 	Salt string
@@ -9,7 +9,7 @@ type JWT struct {
 }
 
 func (j *JWT) DecryptSalt() error {
-	salt, err := chiper.AESDecrypt(chiper.CipherBlock, j.Salt)
+	salt, err := ciper.AESDecrypt(ciper.CipherBlock, j.Salt)
 	if err != nil {
 		return err
 	}

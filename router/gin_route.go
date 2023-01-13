@@ -11,21 +11,25 @@ import (
 	"net/http"
 )
 
-var ginR *GinRoute
+var instance *GinRoute
 
 type GinRoute struct {
 	engin *gin.Engine
 }
 
-func NewGinRoute(mode string) *GinRoute {
-	if ginR != nil {
-		return ginR
+func LoadRouter(mode string) {
+	Route = newGinRoute(mode)
+}
+
+func newGinRoute(mode string) *GinRoute {
+	if instance != nil {
+		return instance
 	}
 	setMode(mode)
-	ginR = &GinRoute{
+	instance = &GinRoute{
 		engin: newEngine(),
 	}
-	return ginR
+	return instance
 }
 
 func (r *GinRoute) Handle() http.Handler {
