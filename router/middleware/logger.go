@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-// GinLogger applied logger in gin
+// GinLogger applied logger at request
 func GinLogger() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		start := time.Now()
@@ -35,7 +35,7 @@ func GinLogger() gin.HandlerFunc {
 	}
 }
 
-// gin 리커버리 대체 설정
+// GinRecovery applied logger at recovery
 func GinRecovery(stack bool) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		defer func() {

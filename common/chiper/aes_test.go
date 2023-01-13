@@ -1,7 +1,6 @@
 package chiper
 
 import (
-	"fmt"
 	"github.com/joho/godotenv"
 	"log"
 	"os"
@@ -33,14 +32,5 @@ func TestGenerateEncrypteAndDecrypt(t *testing.T) {
 		return
 	}
 
-	//decryptedText = removePadding(decryptedText)
-
 	log.Println("Decrypted text is ::", decryptedText)
-}
-
-func removePadding(decryptedText string) string {
-	pt := []byte(decryptedText)
-	padLength := int(pt[len(pt)-1])
-	fmt.Println("####### ", pt[:len(pt)-padLength])
-	return string(pt[:len(pt)-padLength])
 }
