@@ -2,6 +2,8 @@ package flag
 
 import "flag"
 
+const DefaultModePath = "dev"
+
 type FlagCategory struct {
 	Name    string
 	Default string
@@ -23,13 +25,13 @@ var (
 
 	DatabaseFlag = &FlagCategory{
 		Name:    "db",
-		Default: "./config/dev/db/config.toml",
+		Default: "./config/" + DefaultModePath + "/db/config.toml",
 		Usage:   "toml file to use for database configuration",
 	}
 
 	JWTFlag = &FlagCategory{
 		Name:    "jwt",
-		Default: "./config/dev/jwt/config.toml",
+		Default: "./config/" + DefaultModePath + "/jwt/config.toml",
 		Usage:   "toml file to use for jwt configuration",
 	}
 )
