@@ -1,0 +1,5 @@
+level = "debug" # debug / info / warn / error
+filePath = "./logs/go-loger" # log file path
+maxSize = 2000    # 2g : megabytes
+maxAge = 7        # 7days : save days
+maxBackup = 5    # max number of log files

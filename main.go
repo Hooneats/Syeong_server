@@ -1,54 +1,74 @@
 package main
 
 import (
-	"time"
-	"net/http"
-	"github.com/goodnodes/Syeong_server/model"
-	"github.com/goodnodes/Syeong_server/controller"
-	"github.com/goodnodes/Syeong_server/route"
-	"github.com/goodnodes/Syeong_server/config"
+	"github.com/Hooneats/Syeong_server/common/app"
+	"github.com/Hooneats/Syeong_server/common/chiper"
+	"github.com/Hooneats/Syeong_server/common/enum"
+	"github.com/Hooneats/Syeong_server/common/flag"
+	"github.com/Hooneats/Syeong_server/config"
+	"github.com/Hooneats/Syeong_server/controller"
+	"github.com/Hooneats/Syeong_server/logger"
+	"github.com/Hooneats/Syeong_server/model"
+	"github.com/Hooneats/Syeong_server/router"
+	"github.com/Hooneats/Syeong_server/service"
+	"log"
 )
 
-var cfg = config.GetConfig("config/config.toml")
+var (
+	App = app.NewApp()
+
+	flags = []*flag.FlagCategory{
+		flag.ServerConfigFlag,
+		flag.LogConfigFlag,
+		flag.DatabaseFlag,
+		flag.JWTFlag,
+	}
+
+	mongoCollectionNames = []string{
+		enum.UserCollectionName,
+		enum.ContractCollectionName,
+	}
+)
+
+func init() {
+	flag.FlagsLoad(flags)
+	config.LoadConfigs(flag.Flags)
+
+	//Decrypt
+	chiper.LoadCipherKey(config.ServerConfig.Mode)
+	chiper.LoadCipherBlock()
+	if err := config.JWTConfig.DecryptSalt(); err != nil {
+		log.Fatal(err)
+	}
+	if err := config.DBConfig.DecryptURIAndDBName(); err != nil {
+		log.Fatal(err)
+	}
+
+	//logger
+	logger.LoadLogger(config.LogConfig)
+
+	// model
+	err := model.LoadMongoModel(config.DBConfig.URI)
+	if err != nil {
+		log.Fatal(err)
+	}
+	model.LoadMongoCollections(mongoCollectionNames, config.DBConfig.DBName)
+	model.CreateIndexesInModels()
+	model.InjectModelsMongoDependency(model.MongoCollection)
+
+	// service
+	service.InjectServicesDependency()
+
+	// controller
+	controller.InjectControllerDependency()
+
+	// router
+	router.SetAppRoute(
+		router.NewGinRoute(config.ServerConfig.Mode),
+	)
+
+}
 
 func main() {
-	// config 설정
-
-	port := cfg.Server.Port
-	host := cfg.Server.Host
-	dbName := cfg.Server.DBname
-	userModel := cfg.DB["user"]["model"]
-	reviewModel := cfg.DB["review"]["model"]
-	poolModel := cfg.DB["pool"]["model"]
-
-	// logger 설정 추가 필요
-
-	// 원래는 환경변수를 config.toml 파일에서 받아와야 함
-
-	um, err := model.GetUserModel(dbName, host, userModel)
-	if err != nil {
-		panic(err)
-	}
-	rm, err := model.GetReviewModel(dbName, host, reviewModel)
-	if err != nil {
-		panic(err)
-	}
-	pm, err := model.GetPoolModel(dbName, host, poolModel)
-	if err != nil {
-		panic(err)
-	}
-
-	controller := controller.GetNewController(um, pm, rm)
-
-	router := route.GetRouter(controller)
-
-	mapi := &http.Server {
-		Addr : port,
-		Handler : router.Idx(),
-		ReadTimeout : 5 * time.Second,
-		WriteTimeout : 10 * time.Second,
-		MaxHeaderBytes : 1 << 20,
-	}
-
-	mapi.ListenAndServe()
+	App.Run()
 }

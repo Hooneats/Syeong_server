@@ -1,0 +1,9 @@
+mode = "dev" # profile local / dev /prod
+port = ":8080" # server port
+version = "0.1.0"
+name = "WEMIXON"
+description = "위믹스 네트워크 온보딩 서비스"
+author      = ["김성현", "김종서", "김명훈"]
+spec = ["go", "gin-gonic", "mongoDB", "solidity"]
+blog = "https://www.notion.so/codestates/Final-Project-Blockchain-dApp-77bcb57a9dbf4d3c951d3c3c0758da13?p=ff5c6023d8d94d7585c9ac7ecaeb0110&pm=c"
+github = "https://github.com/codestates/WBA-BC-Project-02"

@@ -1,0 +1,5 @@
+uri = "nujY+Ru5BAq9dUnltUFmwINDmENyv4396wb4HWW8CEqtAao9oN8G6npEBh0h2rwh" # mongo uri // mongodb://127.0.0.1:27017
+dbName = "RWg5JT3Z/cCsDlYewTQGyjXDzxd1SDgrENw6926XFPs=" # mongo database name // wemixon
+user = "" # mongo user name
+pwd = "" # mongo password
+backupPath = "./db/backup/"
