@@ -17,14 +17,15 @@ type DB struct {
 	BackupPath string
 }
 
-func (d *DB) DecryptURIAndDBName() error {
-	URI, err := ciper.AESDecrypt(ciper.CipherBlock, d.URI)
+func (d *DB) DecryptFields() error {
+	block := ciper.GetCipherBlock()
+	URI, err := ciper.AESDecrypt(block, d.URI)
 	if err != nil {
 		return err
 	}
 	d.URI = URI
 
-	name, err := ciper.AESDecrypt(ciper.CipherBlock, d.DBName)
+	name, err := ciper.AESDecrypt(block, d.DBName)
 	if err != nil {
 		return err
 	}

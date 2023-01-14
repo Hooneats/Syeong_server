@@ -5,6 +5,7 @@ import (
 	"github.com/Hooneats/Syeong_server/common/ciper"
 	"github.com/Hooneats/Syeong_server/common/enum"
 	"github.com/Hooneats/Syeong_server/common/flag"
+	"github.com/Hooneats/Syeong_server/common/redis"
 	"github.com/Hooneats/Syeong_server/config"
 	"github.com/Hooneats/Syeong_server/controller"
 	"github.com/Hooneats/Syeong_server/logger"
@@ -22,6 +23,7 @@ var (
 		flag.LogConfigFlag,
 		flag.DatabaseFlag,
 		flag.JWTFlag,
+		flag.RedisFlag,
 	}
 
 	mongoCollectionNames = []string{
@@ -37,10 +39,10 @@ func init() {
 	//Decrypt
 	ciper.LoadCipherKey(config.ServerConfig.Mode)
 	ciper.LoadCipherBlock()
-	if err := config.JWTConfig.DecryptSalt(); err != nil {
-		log.Fatal(err)
-	}
-	if err := config.DBConfig.DecryptURIAndDBName(); err != nil {
+	config.DecryptConfigs()
+
+	//Redis
+	if err := redis.LoadRedisClient(config.RedisConfig.DNS); err != nil {
 		log.Fatal(err)
 	}
 
@@ -48,8 +50,7 @@ func init() {
 	logger.LoadLogger(config.LogConfig)
 
 	// model
-	err := model.LoadMongoModel(config.DBConfig.URI, config.DBConfig.DBName, mongoCollectionNames)
-	if err != nil {
+	if err := model.LoadMongoModel(config.DBConfig.URI, config.DBConfig.DBName, mongoCollectionNames); err != nil {
 		log.Fatal(err)
 	}
 	model.CreateIndexesInModels()

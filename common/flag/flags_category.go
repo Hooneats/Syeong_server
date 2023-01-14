@@ -34,6 +34,12 @@ var (
 		Default: "./config/" + DefaultModePath + "/jwt/config.toml",
 		Usage:   "toml file to use for jwt configuration",
 	}
+
+	RedisFlag = &FlagCategory{
+		Name:    "redis",
+		Default: "./config/" + DefaultModePath + "/redis/config.toml",
+		Usage:   "toml file to use for redis configuration",
+	}
 )
 
 func (f *FlagCategory) Load() *string {

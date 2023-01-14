@@ -7,6 +7,7 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"errors"
+	"github.com/Hooneats/Syeong_server/common/enum"
 	"github.com/joho/godotenv"
 	"io"
 	"log"
@@ -15,7 +16,7 @@ import (
 
 //https://pyrasis.com/book/GoForTheReallyImpatient/Unit53/02
 
-var CipherBlock cipher.Block
+var cipherBlock cipher.Block
 
 var cipherKey string
 
@@ -26,26 +27,35 @@ func LoadCipherKey(mode string) {
 	}
 
 	switch mode {
-	case "dev":
-		// .env 로 설정한 환경변수 값보다 시스템에 설정한 환경변수 값이 우선적용된다.
-		if err := godotenv.Load(".env"); err != nil {
-			log.Fatal("Error loading .env file")
+	case enum.DevMode:
+		// .env 로 설정한 환경변수 값보다 시스템에 설정한 환경변수 값이 우선적용된다. 따라서 보안을 위해 dev 일 때만 .env 파일에서 환경변수관리하자
+		if err := godotenv.Load(enum.DevModeENVFilePath); err != nil {
+			log.Fatal("Error loading .env file ::", err.Error())
 		}
-		cipherKey = os.Getenv("WEMIXON_DEV_KEY")
-	case "prod":
-		cipherKey = os.Getenv("WEMIXON_PROD_KEY")
+		setCipherKey(enum.CipherDevKey)
+	case enum.ProdMode:
+		setCipherKey(enum.CipherProdKey)
 	}
+}
+
+func setCipherKey(keyName string) {
+	cipherKey = os.Getenv(keyName)
 }
 
 func LoadCipherBlock() {
 	if cipherKey == "" {
 		log.Fatal("please call LoadCipherKey() function")
 	}
+
 	block, err := aes.NewCipher([]byte(cipherKey)) // AES 대칭키 암호화 블록 생성
 	if err != nil {
 		log.Fatal(err.Error())
 	}
-	CipherBlock = block
+	cipherBlock = block
+}
+
+func GetCipherBlock() cipher.Block {
+	return cipherBlock
 }
 
 func AESEncrypt(block cipher.Block, plainText []byte) (string, error) {

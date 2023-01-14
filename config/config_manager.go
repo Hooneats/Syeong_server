@@ -4,6 +4,7 @@ import (
 	"github.com/Hooneats/Syeong_server/common/flag"
 	configDB "github.com/Hooneats/Syeong_server/config/dev/db"
 	configJWT "github.com/Hooneats/Syeong_server/config/dev/jwt"
+	"github.com/Hooneats/Syeong_server/config/dev/redis"
 	configLog "github.com/Hooneats/Syeong_server/config/log"
 	configServer "github.com/Hooneats/Syeong_server/config/server"
 	"github.com/naoina/toml"
@@ -12,6 +13,7 @@ import (
 )
 
 var DBConfig *configDB.DB
+var RedisConfig *redis.Redis
 var JWTConfig *configJWT.JWT
 var LogConfig *configLog.Log
 var ServerConfig *configServer.Server
@@ -20,6 +22,9 @@ func LoadConfigs(pathMap map[string]*string) {
 
 	dpath := pathMap[flag.DatabaseFlag.Name]
 	DBConfig = NewConfig(*dpath, &configDB.DB{})
+
+	rpath := pathMap[flag.RedisFlag.Name]
+	RedisConfig = NewConfig(*rpath, &redis.Redis{})
 
 	jpath := pathMap[flag.JWTFlag.Name]
 	JWTConfig = NewConfig(*jpath, &configJWT.JWT{})
@@ -40,7 +45,19 @@ func NewConfig[T any](path string, t *T) *T {
 	}
 
 	if err := toml.NewDecoder(file).Decode(t); err != nil {
-		log.Fatal("start app... toml decode, fail")
+		log.Fatal("start app... toml decode, fail ::", err.Error())
 	}
 	return t
+}
+
+func DecryptConfigs() {
+	if err := JWTConfig.DecryptFields(); err != nil {
+		log.Fatal(err)
+	}
+	if err := DBConfig.DecryptFields(); err != nil {
+		log.Fatal(err)
+	}
+	if err := RedisConfig.DecryptFields(); err != nil {
+		log.Fatal(err)
+	}
 }
