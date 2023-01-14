@@ -36,7 +36,8 @@ func CreateToken(userID, accessKey, refreshKey string) (*Token, error) {
 	}, nil
 }
 
-func createAccessToken(userID, accessKey string) (td *TokenDetail, err error) {
+func createAccessToken(userID, accessKey string) (*TokenDetail, error) {
+	td := &TokenDetail{}
 	td.Duration = time.Now().Add(time.Minute * 15).Unix()
 	ati, err := uuid.NewV7()
 	if err != nil {
@@ -57,7 +58,8 @@ func createAccessToken(userID, accessKey string) (td *TokenDetail, err error) {
 	return td, nil
 }
 
-func createRefreshToken(userID, refreshKey string) (td *TokenDetail, err error) {
+func createRefreshToken(userID, refreshKey string) (*TokenDetail, error) {
+	td := &TokenDetail{}
 	td.Duration = time.Now().Add(time.Hour * 2).Unix()
 	rti, err := uuid.NewV7()
 	if err != nil {

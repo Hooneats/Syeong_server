@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/Hooneats/Syeong_server/common/app"
 	"github.com/Hooneats/Syeong_server/common/ciper"
 	"github.com/Hooneats/Syeong_server/common/enum"
@@ -12,6 +13,7 @@ import (
 	"github.com/Hooneats/Syeong_server/model"
 	"github.com/Hooneats/Syeong_server/router"
 	"github.com/Hooneats/Syeong_server/service"
+	"github.com/gofrs/uuid"
 	"log"
 )
 
@@ -68,5 +70,9 @@ func init() {
 }
 
 func main() {
+	uuid, err := uuid.NewV7()
+	if err != nil {
+	}
+	fmt.Println(uuid.String())
 	App.Run()
 }
